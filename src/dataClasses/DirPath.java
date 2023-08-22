@@ -34,4 +34,8 @@ public class DirPath {
 	public static final Path getSettingConfigDir() {
 		return (getTargetPath_SettingConfig() == null) ? Paths.get(DirPath.getSettingDir() + "\\Setting.config") : getTargetPath_SettingConfig();
 	}
+	
+	public final static String getTableExtractorIconDir() {
+		return DirPath.getResourceDir() + "\\TableExtractor_Icon.png";
+	}
 }

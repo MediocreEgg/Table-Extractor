@@ -12,15 +12,19 @@ public class mainFrame {
 	 *		• initFrame - initialize the properties of mainFrame.
 	 * 
 	 */
-	mainFrame(){
-		initFrame();
+	public mainFrame(){
+		
+//		initFrame();
+		
 	}
 	
 	void initFrame(){
 		mainFrame = new JFrame();
 		mainFrame.setTitle("Table Extractor");
 //		mainFrame.setIconImage();
-		mainFrame.setSize(MapSettingConfigFile);
-		
+//		mainFrame.setSize(MapSettingConfigFile.getScreenWidth(), MapSettingConfigFile.getScreenHeight());
+		mainFrame.setVisible(true);
+		mainFrame.setLocationRelativeTo(null);
+		mainFrame.pack();
 	}
 }

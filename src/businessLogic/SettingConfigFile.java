@@ -24,10 +24,10 @@ import dataClasses.EnumHeaderTitles;
  * 			- LogHeader = value
  */
 
-public sealed class SettingConfigFile permits ScreenResolution{
+sealed class SettingConfigFile permits ScreenResolution, DoNotAskAgain{
 
 	
-	static void createConfigFile(){
+	static boolean createConfigFile(){
 		System.out.println("com.TableExtractor.businessLogic.createConfigFile invoked!");
 		if(Files.notExists(DirPath.getSettingConfigDir()) || new File(DirPath.getSettingConfigDir().toString()).length() == 0) 
 			try 
@@ -35,6 +35,7 @@ public sealed class SettingConfigFile permits ScreenResolution{
 				Files.createFile(DirPath.getSettingConfigDir());
 				writeConfigHeaders();
 				System.out.println("Successfully Created SettingConfigFile!");
+				return true;
 			} 
 			catch (FileAlreadyExistsException a) { writeConfigHeaders(); }
 			catch (IOException z) {	z.printStackTrace(); }
@@ -42,6 +43,7 @@ public sealed class SettingConfigFile permits ScreenResolution{
 		else
 			System.out.println("SettingConfigFile already exists!");
 		
+		return false;
 	}
 	
 	
@@ -57,8 +59,8 @@ public sealed class SettingConfigFile permits ScreenResolution{
 	}
 	
 	
-	public <T> void updateLogHeader (EnumHeaderTitles ht, T value) { 
-		System.out.println("updateLogHeader invoked!");
+	protected static <V> void updateLogHeader (EnumHeaderTitles ht, V value) { 
+		System.out.println("updateLogHeader invoked! (Value = "+value+")");
 		try 
 		{
 			List<String> tempList = Files.readAllLines(DirPath.getSettingConfigDir());
@@ -79,6 +81,7 @@ public sealed class SettingConfigFile permits ScreenResolution{
 				default:
 					break;
 			}
+			tempList.forEach((s) -> {System.out.println(s);});	
 			Files.write(DirPath.getSettingConfigDir(), tempList);  
  		}
 		

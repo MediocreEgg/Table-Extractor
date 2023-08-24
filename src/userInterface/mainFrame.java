@@ -1,10 +1,10 @@
 package userInterface;
 
 import javax.swing.JFrame;
-import javax.swing.ImageIcon;
-import businessLogic.MapSettingConfigFile;
+import businessLogic.ScreenResolution;
+import dataClasses.DirPath;
 
-public class mainFrame {
+class mainFrame {
 	private JFrame mainFrame;
 	
 	/*
@@ -13,18 +13,16 @@ public class mainFrame {
 	 * 
 	 */
 	public mainFrame(){
-		
-//		initFrame();
-		
+		initFrame();
+		mainFrame.setLocationRelativeTo(null);
 	}
 	
 	void initFrame(){
 		mainFrame = new JFrame();
 		mainFrame.setTitle("Table Extractor");
-//		mainFrame.setIconImage();
-//		mainFrame.setSize(MapSettingConfigFile.getScreenWidth(), MapSettingConfigFile.getScreenHeight());
+		mainFrame.setIconImage(DirPath.getTableExtractorIconDir());
+		mainFrame.setResizable(false);
+		mainFrame.setSize(ScreenResolution.getWidth(), ScreenResolution.getHeight());
 		mainFrame.setVisible(true);
-		mainFrame.setLocationRelativeTo(null);
-		mainFrame.pack();
 	}
 }

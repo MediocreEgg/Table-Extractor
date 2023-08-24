@@ -24,7 +24,7 @@ import dataClasses.EnumHeaderTitles;
  * 			- LogHeader = value
  */
 
-sealed class SettingConfigFile permits ScreenResolution, DoNotAskAgain{
+class SettingConfigFile {
 
 	
 	static boolean createConfigFile(){
@@ -52,7 +52,7 @@ sealed class SettingConfigFile permits ScreenResolution, DoNotAskAgain{
 		Arrays.stream(EnumHeaderTitles.values()).forEach((buildingBlocks) 
 			 -> {
 					try {
-						Files.writeString(DirPath.getSettingConfigDir(), buildingBlocks + "=" + System.lineSeparator(), StandardOpenOption.APPEND);
+						Files.writeString(DirPath.getSettingConfigDir(), buildingBlocks + "= " + System.lineSeparator(), StandardOpenOption.APPEND);
 					} 
 					catch (IOException e) { System.out.println("Error in writeConfigHeader"); }
 				});
@@ -67,22 +67,28 @@ sealed class SettingConfigFile permits ScreenResolution, DoNotAskAgain{
 			StringBuffer tempSB = new StringBuffer();
 			
 			switch(ht) {
+				case SRWIDTH:
+					tempSB.append(tempList.get(0));
+					tempList.set(0, tempSB.substring(0, tempSB.indexOf("=")+1)+ value);
+					break;
+
 				case SRHEIGHT:
 					tempSB.append(tempList.get(1));
 					tempList.set(1, tempSB.substring(0, tempSB.indexOf("=")+1)+ value);
 					break;
-	
-				case SRWIDTH:
-					tempSB.append(tempList.get(0));
-					tempList.set(0, tempSB.substring(0, tempSB.indexOf("=")+1)+ value);
+					
+				case DONOTASKAGAIN:
+					tempSB.append(tempList.get(2));
+					tempList.set(2, tempSB.substring(0, tempSB.indexOf("=")+1)+ value);
 					break;
 					
 				//add more cases for log headers 
 				default:
 					break;
 			}
-			tempList.forEach((s) -> {System.out.println(s);});	
+//			tempList.forEach((s) -> {System.out.println(s);});	
 			Files.write(DirPath.getSettingConfigDir(), tempList);  
+			MapSettingConfigFile.initMapSetting();
  		}
 		
 		catch (IndexOutOfBoundsException a) { writeConfigHeaders(); }

@@ -1,7 +1,10 @@
 package dataClasses;
 
+import java.awt.Image;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import javax.swing.ImageIcon;
 
 public class DirPath {
 	private final static String workingDir = System.getProperty("user.dir");
@@ -16,7 +19,7 @@ public class DirPath {
 	}
 	
 	public final static String getWorkingDir() {
-		return workingDir;
+		return new String(workingDir);
 	}
 	
 	public final static String getSettingDir() {
@@ -35,7 +38,7 @@ public class DirPath {
 		return (getTargetPath_SettingConfig() == null) ? Paths.get(DirPath.getSettingDir() + "\\Setting.config") : getTargetPath_SettingConfig();
 	}
 	
-	public final static String getTableExtractorIconDir() {
-		return DirPath.getResourceDir() + "\\TableExtractor_Icon.png";
+	public final static Image getTableExtractorIconDir() {
+		return new ImageIcon(DirPath.getResourceDir() + "\\TableExtractor_Icon.png").getImage();
 	}
 }

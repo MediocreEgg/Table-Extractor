@@ -3,26 +3,29 @@ package userInterface;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
-
+	
 import businessLogic.DoNotAskAgain;
 import businessLogic.ScreenResolution;
 import dataClasses.DirPath;
-import dataClasses.EnumHeaderTitles;
 
-public class ResolutionDialog {
+class ResolutionDialog {
 
 	private JFrame resoDialogFrame;
 	private JButton confirmButton;
 	private JCheckBox chkB_doNotShowAgain;
 	private JComboBox<String> cb_resolution;
+	
+	private int selectedIndex = 0;
 	
 	public ResolutionDialog() {
 		initFrame();
@@ -46,10 +49,45 @@ public class ResolutionDialog {
 	private final void initResoCB() {
 		cb_resolution = new JComboBox<String>();
 		cb_resolution.setModel(new DefaultComboBoxModel<>(new String[]{"         - Select Application Resolution - ","1920x1080", "1600x900", "1024x768", "640x480"}));
-		cb_resolution.setSelectedIndex(0);
+		cb_resolution.setSelectedIndex(selectedIndex);
 		cb_resolution.setFont(new Font("Dialog", Font.PLAIN, 12));
 		cb_resolution.setBounds(40, 20, 250, 25);
 		resoDialogFrame.add(cb_resolution);
+		
+		cb_resolution.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {}
+
+			@Override
+			public void mousePressed(MouseEvent e) {}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {}
+
+			@Override
+			public void mouseExited(MouseEvent e) {}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				cb_resolution.addMouseWheelListener(new MouseWheelListener() {
+					@Override
+					public void mouseWheelMoved(MouseWheelEvent e) {
+						System.out.println(cb_resolution.getSelectedIndex());
+						if(e.getWheelRotation() > 0) 
+						{
+							selectedIndex = (selectedIndex > 3) ? 0 : cb_resolution.getSelectedIndex()+1;
+							cb_resolution.setSelectedIndex(selectedIndex);
+						}
+						else
+						{
+							selectedIndex = (selectedIndex < 1) ? 4 : cb_resolution.getSelectedIndex()-1;
+							cb_resolution.setSelectedIndex(selectedIndex);
+						}
+					}
+				});
+			}
+		});
 	}
 	
 	
@@ -67,25 +105,19 @@ public class ResolutionDialog {
 		confirmButton.setBounds(190, 95, 100, 25);
 		confirmButton.setFocusable(false);
 		resoDialogFrame.add(confirmButton);
-
 		confirmButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String[] sr = ScreenResolution.getScreenCategory(cb_resolution.getSelectedIndex());
-				ScreenResolution.updateScreenResolution(sr[0], sr[1]);
+				ScreenResolution.getScreenCategory(cb_resolution.getSelectedIndex());
 				
 				if(chkB_doNotShowAgain.isSelected()) 
-					if(!"ON".equals(DoNotAskAgain.getDonotAskAgain()))
-						DoNotAskAgain.updateDoNotAskAgain("ON");
-				else 
-					if(!"OFF".equals(DoNotAskAgain.getDonotAskAgain()))
-						DoNotAskAgain.updateDoNotAskAgain("OFF");
+					DoNotAskAgain.updateDoNotAskAgain(true);
 				
 				resoDialogFrame.dispose();
 				new mainFrame();
 			}
 		});
-		
 	}
+	
 }

@@ -19,11 +19,11 @@ public class DirPath {
 	}
 	
 	public final static String getWorkingDir() {
-		return new String(workingDir);
+		return workingDir;
 	}
 	
-	public final static String getSettingDir() {
-		return workingDir + "\\Setting";
+	public final static Path getSettingDir() {
+		return Paths.get(workingDir + "\\Setting");
 	}
 	
 	public final static String getResourceDir() {

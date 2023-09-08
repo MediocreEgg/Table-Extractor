@@ -1,21 +1,22 @@
 package businessLogic;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dataClasses.DirPath;
 import dataClasses.EnumHeaderTitles;
+import dataClasses.EnumHeaderValuePair;
 /*
  * 	Setting Config File Structure:
  *	 	Setting.config
@@ -24,78 +25,129 @@ import dataClasses.EnumHeaderTitles;
  * 			- LogHeader = value
  */
 
-class SettingConfigFile {
-
+final class SettingConfigFile {
+	private static final int limit_newline = EnumHeaderTitles.length()-1;
+	private static HashMap<String, StringBuilder> lineHolder = new HashMap<String, StringBuilder>();
 	
-	static boolean createConfigFile(){
+	
+	static boolean createConfigFile() throws IOException {
 		System.out.println("com.TableExtractor.businessLogic.createConfigFile invoked!");
-		if(Files.notExists(DirPath.getSettingConfigDir()) || new File(DirPath.getSettingConfigDir().toString()).length() == 0) 
+		if(Files.notExists(DirPath.getSettingConfigDir()) || Files.size(DirPath.getSettingConfigDir()) == 0) 
+		{
 			try 
 			{
 				Files.createFile(DirPath.getSettingConfigDir());
 				writeConfigHeaders();
 				System.out.println("Successfully Created SettingConfigFile!");
-				return true;
 			} 
-			catch (FileAlreadyExistsException a) { writeConfigHeaders(); }
-			catch (IOException z) {	z.printStackTrace(); }
+			
+			catch (FileAlreadyExistsException a) 
+			{
+				System.err.println("File Already Exist!");
+			}
+			
+			catch (IOException b) 
+			{
+				b.printStackTrace();
+			}
+		
+			return true;
+		}
 		
 		else
 			System.out.println("SettingConfigFile already exists!");
-		
+
 		return false;
 	}
-	
+
 	
 	private final static void writeConfigHeaders() {
 		System.out.println("com.TableExtractor.businessLogic.writeConfigHeaders invoked!");
-		Arrays.stream(EnumHeaderTitles.values()).forEach((buildingBlocks) 
-			 -> {
-					try {
-						Files.writeString(DirPath.getSettingConfigDir(), buildingBlocks + "= " + System.lineSeparator(), StandardOpenOption.APPEND);
-					} 
-					catch (IOException e) { System.out.println("Error in writeConfigHeader"); }
-				});
-	}
-	
-	
-	protected static <V> void updateLogHeader (EnumHeaderTitles ht, V value) { 
-		System.out.println("updateLogHeader invoked! (Value = "+value+")");
+		StringBuilder temp_str = new StringBuilder();
+		int iterationCounter = 0;
+		
 		try 
 		{
-			List<String> tempList = Files.readAllLines(DirPath.getSettingConfigDir());
-			StringBuffer tempSB = new StringBuffer();
-			
-			switch(ht) {
-				case SRWIDTH:
-					tempSB.append(tempList.get(0));
-					tempList.set(0, tempSB.substring(0, tempSB.indexOf("=")+1)+ value);
-					break;
-
-				case SRHEIGHT:
-					tempSB.append(tempList.get(1));
-					tempList.set(1, tempSB.substring(0, tempSB.indexOf("=")+1)+ value);
-					break;
-					
-				case DONOTASKAGAIN:
-					tempSB.append(tempList.get(2));
-					tempList.set(2, tempSB.substring(0, tempSB.indexOf("=")+1)+ value);
-					break;
-					
-				//add more cases for log headers 
-				default:
-					break;
+			for(EnumHeaderTitles eht: EnumHeaderTitles.values()) {
+				temp_str.append(eht.toString() + "= ");
+				
+				if(iterationCounter < limit_newline) {
+					temp_str.append(System.lineSeparator());
+					iterationCounter++;
+				}
 			}
-//			tempList.forEach((s) -> {System.out.println(s);});	
-			Files.write(DirPath.getSettingConfigDir(), tempList);  
-			MapSettingConfigFile.initMapSetting();
- 		}
-		
-		catch (IndexOutOfBoundsException a) { writeConfigHeaders(); }
-		catch (FileNotFoundException b) { createConfigFile(); } 
-		catch (IOException z) { z.printStackTrace(); }
+			
+			Files.writeString(DirPath.getSettingConfigDir(), temp_str.toString(), StandardOpenOption.APPEND);
+		} 
+		catch (IOException e) { e.printStackTrace(); }
 	}
-	
+ 
+		
+	static <V> void updateLogHeader(EnumHeaderTitles eht, String value) {
+		System.out.println("com.TableExtractor.src.businessLogic.SettingConfigFile.updateLogHeader invoked!\t("+value+")");
+		if(value == null || eht == null)
+			return;
+
+		try
+		{
+			Map<String, String> tempMap = new HashMap<String, String>();
+			String[] ArrStr = null;
+			
+			for(String str : Files.readAllLines(DirPath.getSettingConfigDir()))
+			{
+				ArrStr = str.split("=");
+				
+//				if(ArrStr.length != 2)
+//				{
+//					RepairSetting.doConfigIntegrityCheck();
+//					updateLogHeader(eht, value);
+//					return;
+//				}
+				
+				tempMap.put(ArrStr[0], ArrStr[1]);
+			}
+			
+			tempMap.replace(eht.toString(), value);
+			List<String> tempList = new ArrayList<String>();
+			tempMap.forEach((k, v) -> tempList.add(k + "=" + v));
+			
+			Files.write(DirPath.getSettingConfigDir(), tempList);
+			MapSettingConfigFile.loadMapSetting();
+		}
+
+		catch (IOException z) {
+			z.printStackTrace();
+		}
+	}
 
 	
+	static <V> void updateScreenResolution(V width, V height) {
+		if(width == null || height == null)
+			return;
+		
+		try
+		{
+			Map<String, StringBuilder> tempMap = new HashMap<String, StringBuilder>();
+	
+			for(String HeaderValue: Files.readAllLines(DirPath.getSettingConfigDir()).toArray(new String[0])) {
+				String[] ArrStr = HeaderValue.split("=");
+				tempMap.put(ArrStr[0], new StringBuilder().append(ArrStr[1]));
+			}
+			
+			tempMap.replace(EnumHeaderTitles.SRWIDTH.toString(), new StringBuilder().append(width));
+			tempMap.replace(EnumHeaderTitles.SRHEIGHT.toString(), new StringBuilder().append(height));
+			
+
+			List<String> tempList = new ArrayList<String>();
+			tempMap.forEach((k, v) -> tempList.add(k + "=" + v));
+			
+			Files.write(DirPath.getSettingConfigDir(), tempList);
+			MapSettingConfigFile.loadMapSetting();
+		}
+
+		catch (IOException z) {
+			z.printStackTrace();
+		}
+	}
+
 }

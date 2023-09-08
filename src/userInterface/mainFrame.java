@@ -14,7 +14,6 @@ class mainFrame {
 	 */
 	public mainFrame(){
 		initFrame();
-		mainFrame.setLocationRelativeTo(null);
 	}
 	
 	void initFrame(){
@@ -23,6 +22,7 @@ class mainFrame {
 		mainFrame.setIconImage(DirPath.getTableExtractorIconDir());
 		mainFrame.setResizable(false);
 		mainFrame.setSize(ScreenResolution.getWidth(), ScreenResolution.getHeight());
+		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setVisible(true);
 	}
 }

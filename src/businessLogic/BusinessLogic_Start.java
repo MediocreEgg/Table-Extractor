@@ -1,15 +1,21 @@
 package businessLogic;
 
+import java.io.IOException;
+
 public class BusinessLogic_Start{
 	
 	public BusinessLogic_Start(){
-		if(SettingConfigFile.createConfigFile()) 
-		{
-			String[] tempSR = ScreenResolution.getScreenCategory(4);
-			ScreenResolution.updateScreenResolution(tempSR[0], tempSR[1]);
-			DoNotAskAgain.default_DoNotAskAgain();
+		try {
+			if(SettingConfigFile.createConfigFile()) 
+			{
+				ScreenResolution.default_ScreenResolution();
+				DoNotAskAgain.default_DoNotAskAgain();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		MapSettingConfigFile.initMapSetting();
+			
+//		RepairSetting.doConfigIntegrityCheck();
 	}
 	
 }

@@ -1,5 +1,5 @@
 package userInterface;
 
-class menuBar {
-
+final class menuBar {
+	
 }

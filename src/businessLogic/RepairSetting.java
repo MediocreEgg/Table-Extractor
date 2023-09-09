@@ -47,7 +47,8 @@ class RepairSetting {
 	}
 	
 	private static void doHeaderFix(EnumHeaderTitles missingHeader) {
-		
+		System.out.println("MISSING HEADER: " + missingHeader.toString());
+		 	
 	}
 	
 	

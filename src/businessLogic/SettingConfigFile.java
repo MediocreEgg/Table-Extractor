@@ -1,22 +1,16 @@
 package businessLogic;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import dataClasses.DirPath;
 import dataClasses.EnumHeaderTitles;
-import dataClasses.EnumHeaderValuePair;
 /*
  * 	Setting Config File Structure:
  *	 	Setting.config
@@ -27,7 +21,7 @@ import dataClasses.EnumHeaderValuePair;
 
 final class SettingConfigFile {
 	private static final int limit_newline = EnumHeaderTitles.length()-1;
-	private static HashMap<String, StringBuilder> lineHolder = new HashMap<String, StringBuilder>();
+	private static HashMap<String, String> lineHolder = new HashMap<String, String>();
 	
 	
 	static boolean createConfigFile() throws IOException {
@@ -37,7 +31,6 @@ final class SettingConfigFile {
 			try 
 			{
 				Files.createFile(DirPath.getSettingConfigDir());
-				writeConfigHeaders();
 				System.out.println("Successfully Created SettingConfigFile!");
 			} 
 			
@@ -50,12 +43,15 @@ final class SettingConfigFile {
 			{
 				b.printStackTrace();
 			}
+
+			finally 
+			{
+				writeConfigHeaders();
+			}
 		
 			return true;
 		}
 		
-		else
-			System.out.println("SettingConfigFile already exists!");
 
 		return false;
 	}
@@ -88,60 +84,32 @@ final class SettingConfigFile {
 		if(value == null || eht == null)
 			return;
 
-		try
-		{
-			Map<String, String> tempMap = new HashMap<String, String>();
-			String[] ArrStr = null;
-			
-			for(String str : Files.readAllLines(DirPath.getSettingConfigDir()))
-			{
-				ArrStr = str.split("=");
-				
-//				if(ArrStr.length != 2)
-//				{
-//					RepairSetting.doConfigIntegrityCheck();
-//					updateLogHeader(eht, value);
-//					return;
-//				}
-				
-				tempMap.put(ArrStr[0], ArrStr[1]);
-			}
-			
-			tempMap.replace(eht.toString(), value);
-			List<String> tempList = new ArrayList<String>();
-			tempMap.forEach((k, v) -> tempList.add(k + "=" + v));
-			
-			Files.write(DirPath.getSettingConfigDir(), tempList);
+		
+		try {
+			updateLineHolder();
+			lineHolder.replace(eht.toString(), value);
+			Files.write(DirPath.getSettingConfigDir(), lineHolderToList());
 			MapSettingConfigFile.loadMapSetting();
-		}
-
-		catch (IOException z) {
-			z.printStackTrace();
+		} 
+		
+		catch (IOException e)
+		{
+			e.printStackTrace();
 		}
 	}
 
 	
-	static <V> void updateScreenResolution(V width, V height) {
+	static void updateScreenResolution(String width, String height) {
 		if(width == null || height == null)
 			return;
 		
 		try
 		{
-			Map<String, StringBuilder> tempMap = new HashMap<String, StringBuilder>();
-	
-			for(String HeaderValue: Files.readAllLines(DirPath.getSettingConfigDir()).toArray(new String[0])) {
-				String[] ArrStr = HeaderValue.split("=");
-				tempMap.put(ArrStr[0], new StringBuilder().append(ArrStr[1]));
-			}
+			updateLineHolder();
+			lineHolder.replace(EnumHeaderTitles.SRWIDTH.toString(), width);
+			lineHolder.replace(EnumHeaderTitles.SRHEIGHT.toString(), height);
 			
-			tempMap.replace(EnumHeaderTitles.SRWIDTH.toString(), new StringBuilder().append(width));
-			tempMap.replace(EnumHeaderTitles.SRHEIGHT.toString(), new StringBuilder().append(height));
-			
-
-			List<String> tempList = new ArrayList<String>();
-			tempMap.forEach((k, v) -> tempList.add(k + "=" + v));
-			
-			Files.write(DirPath.getSettingConfigDir(), tempList);
+			Files.write(DirPath.getSettingConfigDir(), lineHolderToList());
 			MapSettingConfigFile.loadMapSetting();
 		}
 
@@ -150,4 +118,29 @@ final class SettingConfigFile {
 		}
 	}
 
+	
+	private static void updateLineHolder() {
+		String[] ArrStr = null;
+		try {
+			for(String str : Files.readAllLines(DirPath.getSettingConfigDir()))
+			{
+				ArrStr = str.split("=");
+				
+				if(ArrStr[0].hashCode() == 0 || ArrStr[1].hashCode() == 0)
+					RepairSetting.doConfigIntegrityCheck();
+				
+				lineHolder.put(ArrStr[0], ArrStr[1]);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
+	
+	private static List<String> lineHolderToList(){
+		List<String> tempList = new ArrayList<>();
+		lineHolder.forEach((k, v) -> { tempList.add(k + "=" + v); });
+		return tempList;
+	}
 }

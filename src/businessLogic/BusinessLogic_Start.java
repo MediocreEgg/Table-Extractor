@@ -2,6 +2,7 @@ package businessLogic;
 
 import java.io.IOException;
 
+
 public class BusinessLogic_Start{
 	
 	public BusinessLogic_Start(){
@@ -15,7 +16,7 @@ public class BusinessLogic_Start{
 			e.printStackTrace();
 		}
 			
-//		RepairSetting.doConfigIntegrityCheck();
+		RepairSetting.doConfigIntegrityCheck();
 	}
 	
 }

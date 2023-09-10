@@ -4,46 +4,35 @@ import java.util.Objects;
 @Deprecated
 public class EnumHeaderValuePair {
 
-	private String Header = null;
-	private String Value = null;
+	private int hash = 0;
+	private EnumHeaderTitles Header = null;
 	
-	public EnumHeaderValuePair(String header, String value) {
+	
+	public EnumHeaderValuePair(EnumHeaderTitles header) {
 		this.Header = header;
-		this.Value = value;
+		this.hash = hashCode();
 	}
 	
 
-	public final String getHeader() {
+	public final EnumHeaderTitles getHeader() {
 		return this.Header;
 	}
 
 
 
-	public final void setHeader(String header) {
+	public final void setHeader(EnumHeaderTitles header) {
 		this.Header = header;
-	}
-
-
-
-	public final String getValue() {
-		return this.Value;
-	}
-
-
-
-	public final void setValue(String value) {
-		this.Value = value;
 	}
 
 
 	@Override
 	public String toString() {
-		return Header + "=" + Value;
+		return Header.toString();
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(Header, Value);
+		return Objects.hash(Header);
 	}
 
 	@Override
@@ -55,6 +44,6 @@ public class EnumHeaderValuePair {
 		if (getClass() != obj.getClass())
 			return false;
 		EnumHeaderValuePair other = (EnumHeaderValuePair) obj;
-		return Objects.equals(Header, other.Header) && Objects.equals(Value, other.Value);
+		return Objects.equals(Header, other.Header);
 	}
 }
